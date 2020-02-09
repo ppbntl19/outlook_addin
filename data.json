@@ -1,0 +1,26 @@
+{
+  "title": "Damco",
+  "inputs": [
+    {
+      "type": "radio",
+      "values": [
+        {
+          "label" : "Secrete",
+          "value": "secrete"
+        },
+        {
+          "label" : "Confidential",
+          "value": "confidential"
+        },
+        {
+          "label" : "Internal",
+          "value": "internal"
+        },
+        {
+          "label" : "Public",
+          "value": "public"
+        }
+      ]
+    }
+  ]
+}
