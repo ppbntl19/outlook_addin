@@ -12,7 +12,7 @@ module.exports = async (env, options) => {
     entry: {
       polyfill: "@babel/polyfill",
       commands: "./src/commands/commands.js",
-      dialouge: "./src/taskpane/taskpane.js"
+      taskpane: "./src/taskpane/taskpane.js"
     },
     resolve: {
       extensions: [".ts", ".tsx", ".html", ".js"]

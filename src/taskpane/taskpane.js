@@ -8,11 +8,17 @@ export async function setConfig() {
   //Get value
   let value = $("input[type='radio']:checked").val();
   Office.context.roamingSettings.set("default_classfication", value);
-
   Office.context.roamingSettings.saveAsync();
 }
 
 Office.onReady(info => {
+  //Reset
+  $(".reset_classification").click(function() {
+    Office.context.roamingSettings.remove("default_classfication");
+    Office.context.roamingSettings.saveAsync();
+    $("input:radio[name=radio-group]").val([]);
+  });
+
   //Get Option and data
   $.getJSON("/data.json", function(data) {
     //Set ttile
@@ -33,6 +39,8 @@ Office.onReady(info => {
     });
     //Set properties
     $("input[type='radio']").click(() => tryCatch(setConfig));
+    //Set existing
+    $("input:radio[name=radio-group]").val([getConfig().default_classfication]);
     //Initiate
     tryCatch(setConfig);
   });
