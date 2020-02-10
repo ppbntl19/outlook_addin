@@ -116,7 +116,7 @@ async function setPublic(event) {
   }
 }
 
-function setClassfication(type) {
+async function setClassfication(type) {
   var user_email = Office.context.mailbox.userProfile.emailAddress;
   var timezone = Office.context.mailbox.userProfile.timeZone;
   var body =
@@ -165,16 +165,8 @@ function setClassfication(type) {
         showNotification("Unable to set the subject: " + asyncResult.error.message, "error", "subject");
       }
     });
-    //Set Body (top)
-    Office.context.mailbox.item.body.prependAsync(body, { coercionType: "html" }, function(asyncResult) {
-      if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-        showNotification("Successfully added body", "success", "body");
-      } else {
-        showNotification("Unable to set the body: " + asyncResult.error.message, "error", "body");
-      }
-    });
 
-    //Footer
+    //Footer nd body
     Office.context.mailbox.item.body.getAsync("html", function callback(asyncResult) {
       if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
         var new_body = asyncResult.value + "</br></br></br><h4>" + Footer + "</h4>";
@@ -184,6 +176,15 @@ function setClassfication(type) {
           } else {
             showNotification("body.setAsync call failed with error: " + asyncResult.error.message, "error", "footer");
           }
+          //set body
+          //Set Body (top)
+          Office.context.mailbox.item.body.prependAsync(body, { coercionType: "html" }, function(asyncResult) {
+            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+              showNotification("Successfully added body", "success", "body");
+            } else {
+              showNotification("Unable to set the body: " + asyncResult.error.message, "error", "body");
+            }
+          });
         });
       } else {
         showNotification("Unable to set the footer: " + asyncResult.error.message, "error", "footer");
