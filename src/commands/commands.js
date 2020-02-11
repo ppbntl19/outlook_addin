@@ -39,8 +39,10 @@ async function validateClassfication(event) {
   } else if (is_classified) {
     //Mark classfication set as true
     remove_quick_classfication();
-    //Allow send
-    event.completed({ allowEvent: true });
+      //Allow
+      setTimeout(function() {
+        event.completed({ allowEvent: true });
+      }, 2000);
   } else {
     //Show error
     showNotification(
@@ -153,7 +155,18 @@ async function setClassfication(type) {
           }
         });
       } else {
-        showNotification("Unable to set the category", "error", "category");
+        Office.context.mailbox.item.categories.addAsync([type], function(asyncResult) {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            showNotification("Successfully added categories", "success", "category");
+          } else {
+            showNotification(
+              "categories.addAsync call failed with error: " + asyncResult.error.message,
+              "error",
+              "category"
+            );
+          }
+        });
+        showNotification("Unable to set the category MasterCategories.addAsync"+ asyncResult.error.message, "error", "Createcategory");
       }
     });
 
@@ -166,30 +179,31 @@ async function setClassfication(type) {
       }
     });
 
-    //Footer nd body
-    Office.context.mailbox.item.body.getAsync("html", function callback(asyncResult) {
+    //set body
+    //Set Body (top)
+    Office.context.mailbox.item.body.prependAsync(body, { coercionType: "html" }, function(asyncResult) {
       if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-        var new_body = asyncResult.value + "</br></br></br><h4>" + Footer + "</h4>";
-        Office.context.mailbox.item.body.setAsync(new_body, { coercionType: "html" }, function callback(asyncResult) {
+        showNotification("Successfully added body", "success", "body");
+        //Footer nd body
+        Office.context.mailbox.item.body.getAsync("html", function callback(asyncResult) {
           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-            showNotification("Successfully added footer", "success", "footer");
+            var new_body = asyncResult.value + "</br></br></br><h4>" + Footer + "</h4>";
+            Office.context.mailbox.item.body.setAsync(new_body, { coercionType: "html" }, function callback(asyncResult) {
+              if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+                showNotification("Successfully added footer", "success", "footer");
+              } else {
+                showNotification("body.setAsync call failed with error: " + asyncResult.error.message, "error", "footer");
+              }
+            });
           } else {
-            showNotification("body.setAsync call failed with error: " + asyncResult.error.message, "error", "footer");
+            showNotification("Unable to set the footer: " + asyncResult.error.message, "error", "footer");
           }
-          //set body
-          //Set Body (top)
-          Office.context.mailbox.item.body.prependAsync(body, { coercionType: "html" }, function(asyncResult) {
-            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              showNotification("Successfully added body", "success", "body");
-            } else {
-              showNotification("Unable to set the body: " + asyncResult.error.message, "error", "body");
-            }
-          });
         });
       } else {
-        showNotification("Unable to set the footer: " + asyncResult.error.message, "error", "footer");
+        showNotification("Unable to set the body: " + asyncResult.error.message, "error", "body");
       }
     });
+
   } catch (err) {
     //Show error on body (only dev)
     Office.context.mailbox.item.body.setAsync("<b>" + err + "</b>", { coercionType: "html" }, function callback(

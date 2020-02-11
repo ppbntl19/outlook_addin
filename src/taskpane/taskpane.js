@@ -13,6 +13,7 @@ export async function setConfig() {
 
 Office.onReady(info => {
   //Reset
+
   $(".reset_classification").click(function() {
     Office.context.roamingSettings.remove("default_classfication");
     Office.context.roamingSettings.saveAsync();
