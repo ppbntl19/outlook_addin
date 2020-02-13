@@ -127,7 +127,7 @@ async function setClassfication(type) {
     ". By " +
     user_email +
     " at " +
-    new Date().toLocaleDateString() +
+    new Date().toLocaleString() +
     " " +
     timezone;
   var subject = "This email is classified [" + type + "]";
@@ -180,29 +180,21 @@ async function setClassfication(type) {
     });
 
     //set body
-    //Set Body (top)
-    Office.context.mailbox.item.body.prependAsync(body, { coercionType: "html" }, function(asyncResult) {
-      if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-        showNotification("Successfully added body", "success", "body");
-        //Footer nd body
-        Office.context.mailbox.item.body.getAsync("html", function callback(asyncResult) {
-          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-            var new_body = asyncResult.value + "</br></br></br><h4>" + Footer + "</h4>";
-            Office.context.mailbox.item.body.setAsync(new_body, { coercionType: "html" }, function callback(asyncResult) {
-              if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-                showNotification("Successfully added footer", "success", "footer");
-              } else {
-                showNotification("body.setAsync call failed with error: " + asyncResult.error.message, "error", "footer");
-              }
-            });
-          } else {
-            showNotification("Unable to set the footer: " + asyncResult.error.message, "error", "footer");
-          }
-        });
-      } else {
-        showNotification("Unable to set the body: " + asyncResult.error.message, "error", "body");
-      }
-    });
+      //Footer and body
+      Office.context.mailbox.item.body.getAsync("html", function callback(asyncResult) {
+        if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+          var new_body = "<p>"+body+"</p></br></br>"+ asyncResult.value + "</br></br></br><h4>" + Footer + "</h4>";
+          Office.context.mailbox.item.body.setAsync(new_body, { coercionType: "html" }, function callback(asyncResult) {
+            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+              showNotification("Successfully added footer and body", "success", "footer");
+            } else {
+              showNotification("body.setAsync call failed with error: " + asyncResult.error.message, "error", "footer");
+            }
+          });
+        } else {
+          showNotification("Unable to set the footer and body: " + asyncResult.error.message, "error", "footer");
+        }
+      });
 
   } catch (err) {
     //Show error on body (only dev)
